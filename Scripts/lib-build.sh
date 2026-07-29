@@ -11,6 +11,20 @@
 # 最低支持的 macOS 版本，需与 Package.swift 的 platforms 保持一致
 MACOS_MIN="13.0"
 
+# 从源码里的 appVersion 读版本号——单一来源，避免 Info.plist / DMG 文件名 / Release
+# 标签各写一份然后互相不一致（之前 Info.plist 就一直停在 1.0 而 appVersion 已经是 1.2）。
+read_version() {
+    local root="$1"
+    local v
+    v="$(rg -o 'appVersion = "([^"]+)"' -r '$1' \
+         "$root/Sources/FanControlCore/FanModels.swift" | head -1)"
+    if [[ -z "$v" ]]; then
+        echo "错误：无法从 FanModels.swift 解析 appVersion" >&2
+        return 1
+    fi
+    printf '%s' "$v"
+}
+
 # 分架构编译并合并成通用二进制。
 #   $1 = product 名（LeoFanControl / fanhelperd）
 #   $2 = 输出路径

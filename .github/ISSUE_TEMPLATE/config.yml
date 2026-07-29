@@ -1,0 +1,15 @@
+# 只允许用上面两个模板开 issue，避免收到缺少机型/日志的空白反馈。
+# 提问和功能想法引导到 Discussions。
+blank_issues_enabled: false
+contact_links:
+  - name: 提问与讨论
+    url: https://github.com/nzleo/LeoMacFanControl/discussions
+    about: 使用上的疑问、功能想法、想聊聊温控参数怎么调，都在这里。不确定是不是 bug 的话也先来这里。
+
+  - name: 先看故障排查文档
+    url: https://github.com/nzleo/LeoMacFanControl/blob/main/docs/troubleshooting.md
+    about: 面板一直显示「仅监控」、Gatekeeper 拦截、Intel 无法控速等常见情况这里都有解法。
+
+  - name: 了解实现原理
+    url: https://github.com/nzleo/LeoMacFanControl/blob/main/docs/how-it-works.md
+    about: 想知道为什么某些机型控速会被系统拒绝，看这里。

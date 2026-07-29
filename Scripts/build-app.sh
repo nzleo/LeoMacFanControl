@@ -30,6 +30,9 @@ for arg in "$@"; do
     esac
 done
 
+VERSION="$(read_version "$ROOT_DIR")" || exit 1
+echo "==> 版本：${VERSION}"
+
 APP="$ROOT_DIR/$APP_NAME.app"
 echo "==> 组装应用包 $APP"
 rm -rf "$APP"
@@ -43,13 +46,29 @@ else
 fi
 chmod 755 "$APP/Contents/MacOS/$APP_NAME"
 
-# 图标由 make-icon.swift 现场矢量绘制，仓库里不存二进制素材。
+# 图标：混合方案。
+# make-icon.swift 先纯代码画出全部 10 个尺寸；若 Resources/AppIcon-source.png 存在，
+# prepare-icon.swift 再把 128 像素及以上替换成位图版（抠透明 + 超椭圆遮罩）。
+# 小尺寸保留代码绘制版——位图素材细节太密，缩到 16/32 像素会糊成色斑。
+# 源图不存在时自动退回纯代码绘制，行为与引入素材之前完全一致。
 # 生成失败不阻断打包——没图标只影响 Finder / 登录项列表的观感，不影响功能。
 echo "==> 生成图标"
 ICON_TMP="$(mktemp -d)"
 trap 'rm -rf "$ICON_TMP"' EXIT
 ICON_OK=0
+ICON_SOURCE="$ROOT_DIR/Resources/AppIcon-source.png"
 if swift "$SCRIPT_DIR/make-icon.swift" "$ICON_TMP"; then
+    if [[ -f "$ICON_SOURCE" ]]; then
+        echo "==> 检测到位图素材，叠加大尺寸位图版"
+        if ! swift "$SCRIPT_DIR/prepare-icon.swift" \
+                "$ICON_SOURCE" \
+                "$ICON_TMP/AppIcon.iconset" \
+                "$ROOT_DIR/Resources/AppIcon-256.png"; then
+            echo "提示：位图版处理失败，沿用纯代码绘制的图标。"
+        fi
+    else
+        echo "==> 未找到 ${ICON_SOURCE}，使用纯代码绘制图标"
+    fi
     if [[ -f "$ICON_TMP/AppIcon.icns" ]]; then
         cp "$ICON_TMP/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
         ICON_OK=1
@@ -78,9 +97,9 @@ cat > "$APP/Contents/Info.plist" <<PLIST_EOF
     <key>CFBundleIdentifier</key>
     <string>$BUNDLE_ID</string>
     <key>CFBundleVersion</key>
-    <string>1.0</string>
+    <string>$VERSION</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>$VERSION</string>
     <key>CFBundleExecutable</key>
     <string>$APP_NAME</string>
     <key>CFBundlePackageType</key>

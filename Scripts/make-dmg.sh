@@ -30,12 +30,8 @@ cd "$ROOT_DIR"
 source "$SCRIPT_DIR/lib-build.sh"
 
 # 版本号取自源码里的 appVersion，保证 DMG 文件名和 App 里显示的版本一致
-VERSION="$(rg -o 'appVersion = "([^"]+)"' -r '$1' Sources/FanControlCore/FanModels.swift | head -1)"
-if [[ -z "$VERSION" ]]; then
-    echo "错误：无法从 FanModels.swift 解析 appVersion" >&2
-    exit 1
-fi
-echo "==> 版本：$VERSION"
+VERSION="$(read_version "$ROOT_DIR")" || exit 1
+echo "==> 版本：${VERSION}"
 
 DIST_DIR="$ROOT_DIR/dist"
 STAGE="$(mktemp -d)"
@@ -161,9 +157,27 @@ GUI 直接把 LeoFanControl.app 拖到废纸篓即可（如果开了开机自启
   硬件 min~max 之间，并内置高温强制满速保护。但仍请留意温度，自担风险。
 
 
+遇到问题 / 反馈
+----------------------------------------
+项目主页（含完整文档与最新版本）：
+    https://github.com/nzleo/LeoMacFanControl
+
+· 报告问题：https://github.com/nzleo/LeoMacFanControl/issues/new?template=bug.yml
+· 回报你的机型能不能用（很欢迎！）：
+  https://github.com/nzleo/LeoMacFanControl/issues/new?template=compat-report.yml
+· 提问与讨论：https://github.com/nzleo/LeoMacFanControl/discussions
+· 故障排查文档：
+  https://github.com/nzleo/LeoMacFanControl/blob/main/docs/troubleshooting.md
+
+目前只有 M4 Mac mini 是实测校准过的，其他机型的温控曲线还是估算值。
+如果你愿意花两分钟回报一下自己机型的风扇转速范围和空闲/满载温度，
+就能让那个机型的曲线从「猜」变成「有依据」。
+
+
 源码
 ----------------------------------------
 全部源码可逐行审计，只用 Apple 自带框架，没有任何网络代码。
+以 MIT 许可证发布。
 GUIDE
 
 # ── 4. 生成 DMG

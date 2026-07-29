@@ -65,12 +65,15 @@ func drawIcon(pixels S: CGFloat, into ctx: CGContext) {
     let cs = CGColorSpaceCreateDeviceRGB()
 
     // ── 底：冷色渐变，左上偏亮
+    // 三个控制点取自 Resources/AppIcon-source.png 的实测采样（顶部 #60D0FE、底部 #002FB9），
+    // 目的是让小尺寸的代码绘制版与 128px 及以上的位图版配色对齐，
+    // 避免用户在 64→128 的尺寸交界处看到明显的色调跳变。
     ctx.saveGState()
     bg.addClip()
     let grad = CGGradient(colorsSpace: cs, colors: [
-        NSColor(srgbRed: 0.36, green: 0.72, blue: 0.98, alpha: 1).cgColor,
-        NSColor(srgbRed: 0.13, green: 0.42, blue: 0.86, alpha: 1).cgColor,
-        NSColor(srgbRed: 0.07, green: 0.24, blue: 0.60, alpha: 1).cgColor,
+        NSColor(srgbRed: 0.376, green: 0.816, blue: 0.996, alpha: 1).cgColor,  // #60D0FE
+        NSColor(srgbRed: 0.118, green: 0.435, blue: 0.910, alpha: 1).cgColor,  // #1E6FE8
+        NSColor(srgbRed: 0.000, green: 0.184, blue: 0.725, alpha: 1).cgColor,  // #002FB9
     ] as CFArray, locations: [0, 0.55, 1])!
     ctx.drawLinearGradient(grad,
                            start: CGPoint(x: box.minX, y: box.maxY),

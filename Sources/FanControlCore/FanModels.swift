@@ -323,5 +323,7 @@ public func computeTargetRPM(config: FanConfig,
 }
 
 /// 版本号。守护进程会把它上报给 GUI，用来判断"面板里的新功能对应的守护进程是否已重装"。
+/// 打包脚本也从这里读版本号写进 Info.plist 与 DMG 文件名，这是唯一来源。
 /// 1.1 → 1.2：新增目标温度闭环模式、按实测重新校准曲线、Intel `FS!` 通道、通用二进制。
-public let appVersion = "1.2"
+/// 1.2 → 1.3：更换 App 图标（位图素材 + 小尺寸代码绘制混合方案）、README 重构为落地页。
+public let appVersion = "1.3"

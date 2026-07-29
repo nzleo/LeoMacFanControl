@@ -1,0 +1,135 @@
+name: 机型适配报告
+description: 回报你的 Mac 上控速能不能用、以及实测的温度与转速数据
+title: "[机型] "
+labels: ["机型适配"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **这类反馈的价值非常高。**
+
+        目前只有 M4 Mac mini 是实测校准过的，其他机型（尤其是 Intel 和 MacBook）
+        的温控曲线都还是估算值。你提供的一组数据——风扇 RPM 范围、空闲和满载温度——
+        就能让那个机型的曲线从"猜"变成"有依据"。
+
+        **控速没成功也请提交。** "这个机型不行"同样是有用的信息，
+        能帮我们判断某条控制通道在哪些机型上被系统拒绝。
+
+  - type: input
+    id: mac-model
+    attributes:
+      label: Mac 机型
+      description: 终端执行 `sysctl -n hw.model`，例如 `Mac16,10`。请一并写上商品名。
+      placeholder: "Mac16,10（Mac mini 2024）"
+    validations:
+      required: true
+
+  - type: input
+    id: chip
+    attributes:
+      label: 芯片
+      placeholder: "M4（10 核）／Intel Core i9 9880H"
+    validations:
+      required: true
+
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS 版本
+      placeholder: "15.7"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: control-works
+    attributes:
+      label: 控速是否生效？
+      description: |
+        判断方法：装好守护进程后切到"手动固定"，把滑块拉到 80% 以上，
+        听风扇声音是否明显变大、面板里的实际转速是否跟着上去。
+      options:
+        - 生效——能正常控速
+        - 部分生效——能设但会被系统抢回
+        - 不生效——面板提示系统拒绝
+        - 不生效——面板显示"仅监控"，守护进程连不上
+        - 还没试／不确定
+    validations:
+      required: true
+
+  - type: textarea
+    id: panel-status
+    attributes:
+      label: 面板显示的状态文字
+      description: 右上角的状态，以及底部如果有失败原因提示也请抄下来。
+      placeholder: |
+        右上角：守护进程运行中
+        底部提示：（无）
+    validations:
+      required: true
+
+  - type: input
+    id: rpm-range
+    attributes:
+      label: 风扇转速范围（RPM）
+      description: |
+        面板上能看到，或从守护进程状态里的 `minRPM` / `maxRPM` 读。
+        多风扇机型（MacBook Pro 通常两个）请都写上。
+      placeholder: "1000 – 4900（单风扇）"
+    validations:
+      required: true
+
+  - type: input
+    id: idle-temp
+    attributes:
+      label: 空闲温度
+      description: |
+        **重要：请在真正空闲时读数**——关掉编译、浏览器视频、AI 任务等，
+        静置 2 分钟以上再看。边干活边测出来的数是污染数据，
+        我们之前就因此把曲线基线错标成 71°C（真实值是 52°C）。
+
+        请写"核心平均温度 / 单核峰值"两个数，面板上都有。
+      placeholder: "52°C / 62°C（系统自动模式，最低转速）"
+    validations:
+      required: true
+
+  - type: input
+    id: load-temp
+    attributes:
+      label: 满载温度（可选，但很有价值）
+      description: |
+        跑一个能吃满所有核心的任务（例如 `yes > /dev/null` 开够线程数，
+        或编译一个大项目），持续 2 分钟以上，等温度稳定后读数。
+
+        如果能分别记下"系统自动模式"和"手动固定 100%"两种情况，
+        那就是最有用的数据——两者之差就是这台机器风扇的实际控温能力。
+      placeholder: "系统自动：87°C+ 持续上升 / 手动 100%：65°C 稳定"
+    validations:
+      required: false
+
+  - type: textarea
+    id: daemon-status
+    attributes:
+      label: 守护进程上报的状态（强烈推荐附上）
+      description: |
+        需要你的账号在 admin 组。终端执行：
+
+        ```
+        printf '{"command":"getStatus"}\n' | nc -U /var/run/com.leo.fancontrol.sock
+        ```
+
+        这一条输出里同时包含了传感器读数、RPM 范围、走的是哪条控制通道
+        （`hasFtst` / `hasForceMask` / `isAppleSilicon`），
+        比上面手填的信息更准确、更完整。
+      render: json
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 其他观察（可选）
+      description: |
+        例如：自动模式下风扇行为是否合理？曲线起点是不是太早／太晚提速？
+        噪音在什么转速开始变得明显？这些主观感受对调档位很有参考价值。
+    validations:
+      required: false
