@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LaunchDaemon 配置（参考）。实际安装时由 Scripts/install.sh 生成同样内容，
+  以保证 ProgramArguments 路径正确。此文件仅供查阅。
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.leo.fancontrol.helper</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Library/Application Support/LeoFanControl/fanhelperd</string>
+    </array>
+
+    <!-- 开机/登录前即随系统启动，崩溃自动重启 -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Library/Logs/LeoFanControl/fanhelperd.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Library/Logs/LeoFanControl/fanhelperd.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
