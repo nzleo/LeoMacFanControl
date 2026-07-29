@@ -2,7 +2,10 @@
 #
 # build-app.sh —— 编译 GUI 并打包成标准的 LeoFanControl.app 应用包。
 #
-# 用法（普通用户，不用 sudo）：  ./Scripts/build-app.sh
+# 用法（普通用户，不用 sudo）：
+#   ./Scripts/build-app.sh              仅编译本机架构（本地开发，快）
+#   ./Scripts/build-app.sh --universal  编译通用二进制（Apple 芯片 + Intel，分发用）
+#
 # 产物：项目根目录下的 LeoFanControl.app
 #
 # 之后可把它拖进 /Applications，双击运行；在面板里打开“开机自动启动”。
@@ -16,21 +19,29 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT_DIR"
 
-echo "==> 编译 GUI（release）"
-swift build -c release --product "$APP_NAME"
+# shellcheck source=Scripts/lib-build.sh
+source "$SCRIPT_DIR/lib-build.sh"
 
-EXE="$ROOT_DIR/.build/release/$APP_NAME"
-if [[ ! -f "$EXE" ]]; then
-    echo "错误：编译产物不存在：$EXE"
-    exit 1
-fi
+UNIVERSAL=0
+for arg in "$@"; do
+    case "$arg" in
+        --universal) UNIVERSAL=1 ;;
+        *) echo "未知参数：${arg}（可用：--universal）" >&2; exit 2 ;;
+    esac
+done
 
 APP="$ROOT_DIR/$APP_NAME.app"
 echo "==> 组装应用包 $APP"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
 mkdir -p "$APP/Contents/Resources"
-cp "$EXE" "$APP/Contents/MacOS/$APP_NAME"
+
+if [[ "$UNIVERSAL" == "1" ]]; then
+    build_universal "$APP_NAME" "$APP/Contents/MacOS/$APP_NAME" "$ROOT_DIR"
+else
+    build_native "$APP_NAME" "$APP/Contents/MacOS/$APP_NAME" "$ROOT_DIR"
+fi
+chmod 755 "$APP/Contents/MacOS/$APP_NAME"
 
 # 图标由 make-icon.swift 现场矢量绘制，仓库里不存二进制素材。
 # 生成失败不阻断打包——没图标只影响 Finder / 登录项列表的观感，不影响功能。

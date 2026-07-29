@@ -28,10 +28,11 @@ public struct FanSnapshot: Codable, Sendable {
 public final class SMCReader {
     private let smc: SMCConnection
 
-    // 缓存：温度传感器键列表、风扇模式键大小写、Ftst 是否存在
+    // 缓存：温度传感器键列表、风扇模式键大小写、Ftst 是否存在、FS! 是否存在
     private var cpuTempKeys: [String]?
     private var fanModeKeyCache: [Int: String] = [:]
     private var ftstAvailable: Bool?
+    private var forceMaskAvailable: Bool?
 
     public init(connection: SMCConnection) {
         self.smc = connection
@@ -58,7 +59,8 @@ public final class SMCReader {
         return readUInt8("FNum") ?? 0
     }
 
-    /// 探测某个风扇的模式键大小写（M4 等为大写 F0Md，M5 为小写 F0md）
+    /// 探测某个风扇的模式键大小写（M4 等为大写 F0Md，M5 为小写 F0md）。
+    /// T2 之前的旧款 Intel Mac 没有这个键，返回 nil——那些机型走 `FS!` 位掩码，见 `forceMaskKey`。
     public func fanModeKey(_ index: Int) -> String? {
         if let cached = fanModeKeyCache[index] { return cached }
         let upper = "F\(index)Md"
@@ -74,6 +76,37 @@ public final class SMCReader {
         return nil
     }
 
+    // MARK: FS! 强制模式位掩码（T2 之前的 Intel Mac）
+
+    /// 旧款 Intel Mac 的风扇强制模式键。注意键名只有 3 个可见字符，
+    /// 第 4 位是空格——`SMCConnection.stringToKey` 会自动补 0x20，所以这里写 "FS!" 即可。
+    public static let forceMaskKey = "FS!"
+
+    /// 本机是否存在 `FS! ` 键。Apple 芯片与 T2 Intel 机型没有它。
+    public func hasForceMask() -> Bool {
+        if let cached = forceMaskAvailable { return cached }
+        let available = (try? smc.readKeyInfo(Self.forceMaskKey)) != nil
+        forceMaskAvailable = available
+        return available
+    }
+
+    /// 读取 `FS! ` 位掩码。位 N = 风扇 N 处于强制（手动）模式。
+    public func forceMask() -> Int? {
+        guard let raw = try? smc.readRaw(Self.forceMaskKey) else { return nil }
+        // 该键通常是 ui16 大端；也见过按 2 字节裸整数返回的固件，统一按大端拼装
+        switch raw.bytes.count {
+        case 0:  return nil
+        case 1:  return Int(raw.bytes[0])
+        default: return Int(UInt16(raw.bytes[0]) << 8 | UInt16(raw.bytes[1]))
+        }
+    }
+
+    /// 某个风扇在 `FS! ` 位掩码里是否被置为强制模式
+    public func isForcedByMask(_ index: Int) -> Bool {
+        guard index >= 0, index < 16, let mask = forceMask() else { return false }
+        return (mask >> index) & 1 == 1
+    }
+
     /// 读取一个风扇的完整快照
     public func fanSnapshot(_ index: Int) -> FanSnapshot {
         let actual = readDouble("F\(index)Ac") ?? 0
@@ -81,7 +114,12 @@ public final class SMCReader {
         let mn = readDouble("F\(index)Mn") ?? 0
         let mx = readDouble("F\(index)Mx") ?? 0
         var mode = -1
-        if let mk = fanModeKey(index), let m = readUInt8(mk) { mode = m }
+        if let mk = fanModeKey(index), let m = readUInt8(mk) {
+            mode = m
+        } else if hasForceMask() {
+            // 旧款 Intel：没有模式键，用位掩码推断出等价的 0/1 语义
+            mode = isForcedByMask(index) ? 1 : 0
+        }
         return FanSnapshot(index: index, actualRPM: actual, targetRPM: target,
                            minRPM: mn, maxRPM: mx, mode: mode)
     }

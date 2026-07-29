@@ -215,13 +215,20 @@ public struct DaemonStatus: Codable, Sendable {
     public var controlFailureReason: String?
     /// 目标温度模式下：已满速仍压不到目标温度（持续 60s 以上）
     public var targetUnreachable: Bool
+    /// 本机是否走 `FS! ` 位掩码控速（T2 之前的旧款 Intel Mac）。
+    /// 分享给别人用时，这个字段是判断对方机型走哪条控制通道的关键诊断信息。
+    public var hasForceMask: Bool
+    /// 是否为 Apple 芯片（诊断用：曲线按平台分别校准）
+    public var isAppleSilicon: Bool
 
     public init(fans: [FanSnapshot], cpuTempC: Double?, cpuTempMaxC: Double?,
                 smoothedTempC: Double? = nil, smoothedMaxC: Double? = nil,
                 controlActive: Bool, hasFtst: Bool, appliedMode: ControlMode,
                 safetyEngaged: Bool, version: String,
                 config: FanConfig? = nil, controlFailureReason: String? = nil,
-                targetUnreachable: Bool = false) {
+                targetUnreachable: Bool = false,
+                hasForceMask: Bool = false,
+                isAppleSilicon: Bool = Platform.isAppleSilicon) {
         self.fans = fans
         self.cpuTempC = cpuTempC
         self.cpuTempMaxC = cpuTempMaxC
@@ -235,6 +242,8 @@ public struct DaemonStatus: Codable, Sendable {
         self.config = config
         self.controlFailureReason = controlFailureReason
         self.targetUnreachable = targetUnreachable
+        self.hasForceMask = hasForceMask
+        self.isAppleSilicon = isAppleSilicon
     }
 
     /// 手写解码：`targetUnreachable` 缺失时退回 false。
@@ -255,6 +264,9 @@ public struct DaemonStatus: Codable, Sendable {
         config = try c.decodeIfPresent(FanConfig.self, forKey: .config)
         controlFailureReason = try c.decodeIfPresent(String.self, forKey: .controlFailureReason)
         targetUnreachable = try c.decodeIfPresent(Bool.self, forKey: .targetUnreachable) ?? false
+        hasForceMask = try c.decodeIfPresent(Bool.self, forKey: .hasForceMask) ?? false
+        isAppleSilicon = try c.decodeIfPresent(Bool.self, forKey: .isAppleSilicon)
+            ?? Platform.isAppleSilicon
     }
 }
 
@@ -310,4 +322,6 @@ public func computeTargetRPM(config: FanConfig,
     return rpm(forFraction: f, fan: fan)
 }
 
-public let appVersion = "1.1"
+/// 版本号。守护进程会把它上报给 GUI，用来判断"面板里的新功能对应的守护进程是否已重装"。
+/// 1.1 → 1.2：新增目标温度闭环模式、按实测重新校准曲线、Intel `FS!` 通道、通用二进制。
+public let appVersion = "1.2"

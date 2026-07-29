@@ -139,7 +139,9 @@ final class Daemon {
                             version: appVersion,
                             config: config,
                             controlFailureReason: controlActive ? controller.lastFailureReason : nil,
-                            targetUnreachable: engine.targetUnreachable)
+                            targetUnreachable: engine.targetUnreachable,
+                            hasForceMask: reader.hasForceMask(),
+                            isAppleSilicon: Platform.isAppleSilicon)
     }
 
     // MARK: 配置校验与持久化

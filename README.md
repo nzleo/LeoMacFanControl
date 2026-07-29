@@ -31,6 +31,21 @@
   - **M4**：部分机型需要 `Ftst` 解锁，本工程已实现。但**实测 Mac mini（Mac16,10, M4）的 SMC 里根本没有 `Ftst` 键**，只能走"直接写模式键"这一条路；如果系统拒绝，就没有别的后手了。
   - **M5**：模式键变成小写 `F0md`、且无 `Ftst`，可直接写——本工程已自动探测大小写。
 - 个别新机型可能"写了没反应"（系统强行覆盖）。如果遇到，App 仍可正常**监控**，面板上会明确显示"控速未生效"及原因——这是系统层限制，不是代码 bug。
+
+**Intel Mac 走的是另一套机制**，本工程都已实现，运行期自动选择：
+
+| 机型 | 控制通道 | 说明 |
+|---|---|---|
+| Apple 芯片（M 系列） | `F{i}Md = 1` + 必要时 `Ftst` 解锁 | 已在 M4 Mac mini 实测通过 |
+| **T2 Intel（2018 及以后）** | `F{i}Md = 1` | 和 Apple 芯片同一条路径；这类机型的 `FS!` 键缺失或被忽略 |
+| **T2 之前的 Intel（2017 及以前）** | `FS! ` 位掩码 | 没有 `F{i}Md` 键，只能写 `FS!`（位 N = 风扇 N 强制手动），再写 `F{i}Tg` |
+
+几个实现要点：
+
+- `FS!` 键名只有 3 个可见字符，第 4 位是空格。`SMCConnection.stringToKey` 不足 4 字符会自动补 `0x20`，所以代码里写 `"FS!"` 即可。
+- 目标转速的**数据类型因机型而异**：Apple 芯片和 T2 机型的 `F{i}Tg` 是 4 字节浮点（`flt`），老 Intel 是 2 字节定点（`fpe2`，值 ×4 大端）。本工程不硬编码类型，而是先用 `readKeyInfo` 取该键在固件里的真实类型再编码，所以两者自动都对。
+- 归还系统控制时，除了把模式键写回 0，还会清掉 `FS!` 里对应的强制位。**漏清这一步会把风扇永久留在强制模式，比控速失败更危险。**
+- ⚠️ **Intel 的温控曲线未经实机验证。** 曲线控制点是在 M4 Mac mini 上实测校准的，Intel 的温度量级完全不同（`TC0P/TC0D` 空闲 40~50°C、满载 90°C+），`intelPoints` 是按公开资料给的经验值。Intel 用户建议先用"手动固定"确认风扇确实响应，再切自动模式。
 - ⚠️ **风险**：把风扇设得过低可能导致过热。本工程的自动曲线只会"按需升速"，目标温度模式的可设范围下限也卡在物理可达的 65°C，手动转速则被夹在硬件 `min~max` 区间内；三种模式之上还有**高温强制满速保护**（默认 ≥100°C，可在面板里 85–110°C 之间调整），优先级高于一切模式。但仍请留意温度，自担风险。
 
 ---
@@ -54,6 +69,8 @@ AppleSMC 内核驱动 → SMC 固件 → 风扇
 - `Sources/LeoFanControl/`：菜单栏 GUI。
 - `Sources/fanhelperd/`：root 守护进程。
 - `Scripts/`：构建与安装脚本。
+- `Scripts/lib-build.sh`：被 `build-app.sh` / `make-dmg.sh` 复用的构建函数（含通用二进制的分架构编译 + `lipo` 合并）。
+- `Scripts/make-dmg.sh`：打包可分享的 DMG（通用二进制 + 预编译守护进程 + 安装说明）。
 - `Scripts/make-icon.swift`：App 图标生成器。图标是**纯代码矢量绘制**（AppKit / CoreGraphics），
   打包时由 `build-app.sh` 现场生成 `AppIcon.icns`，仓库里不存任何二进制图片素材，
   和"全部可逐行审计"的原则一致。小尺寸（≤32 像素）走简化几何（4 叶、去投影），
@@ -195,6 +212,44 @@ sudo ./Scripts/install.sh
 > 枚举里不存在，旧二进制会拒绝这条配置（面板显示控速未生效）。配置文件本身是向后兼容的：
 > 旧 `config.json` 缺少新字段时会自动退回默认值（目标 75°C / 死区 4°C），不会丢设置。
 
+### 第 3 步（可选）：打包 DMG 分享给别人
+
+```bash
+./Scripts/make-dmg.sh
+```
+
+产物 `dist/LeoFanControl-<版本>.dmg`，约 1.7 MB，里面包含：
+
+- `LeoFanControl.app` —— **通用二进制**（`x86_64 + arm64`），Apple 芯片和 Intel Mac 都能跑
+- `应用程序` 软链接 —— 方便拖拽安装
+- `守护进程（控速必需）/` —— 预编译好的通用 `fanhelperd` + `install.sh` + `uninstall.sh`，
+  **对方不需要装 Xcode 也能安装守护进程**
+- `安装说明.txt` —— 含 Gatekeeper 放行步骤
+
+关于通用二进制的构建方式：`swift build --arch arm64 --arch x86_64` 依赖完整 Xcode 里的
+`xcbuild`，只装了 Command Line Tools 的机器会失败。所以 `Scripts/lib-build.sh` 改成
+**分别编译两个架构再用 `lipo` 合并**，只依赖 swiftc 自带的交叉编译能力。合并后会校验
+两个架构都在，缺一个就直接失败——宁可不出包，也不要发出一个只能跑一半机器的包。
+
+`./Scripts/build-app.sh` 默认只编译本机架构（本地开发快），加 `--universal` 才出通用二进制。
+
+#### ⚠️ Gatekeeper：对方首次打开会被拦
+
+本工程用 **ad-hoc 签名**，没有 Apple Developer ID（每年 99 美元）、也**未做公证（notarization）**。
+所以别人从 DMG 拷出来首次打开时，系统会提示"无法验证开发者"并拒绝运行。这是签名策略的
+必然结果，不是打包错误。放行方式（`安装说明.txt` 里也写了）：
+
+```bash
+# 最快的方式：移除隔离属性
+xattr -dr com.apple.quarantine /Applications/LeoFanControl.app
+```
+
+或者按住 Control 点击 App 图标 → 选"打开" → 弹窗里再点一次"打开"；
+或先双击一次被拦，再去 系统设置 ▸ 隐私与安全性 点"仍要打开"。
+
+> 如果要做到"双击即开、零提示"，需要付费的 Developer ID 证书加公证流程。
+> 本工程刻意不引入这一步，因为那要求把签名密钥放进构建环境。
+
 ---
 
 ## 7. 使用
@@ -242,7 +297,8 @@ sudo ./Scripts/uninstall.sh
 ## 9. 故障排查
 
 - **面板一直显示"仅监控"**：守护进程没装或没起来。检查：`sudo launchctl print system/com.leo.fancontrol.helper`，看日志：`sudo tail -f /Library/Logs/LeoFanControl/fanhelperd.log`。
-- **选了"目标温度"但控速未生效**：守护进程还是 1.1 版。重新 `swift build -c release --product fanhelperd` 并 `sudo ./Scripts/install.sh`。
+- **选了"目标温度"但控速未生效**：守护进程还是 1.1 版（面板/状态里的 `version` 字段可以确认）。
+  重新 `swift build -c release --product fanhelperd` 并 `sudo ./Scripts/install.sh`。
 - **目标温度模式弹橙色"该目标对本机不可达"**：设的目标低于本机物理下限。满载时本机满速也只能到 65°C，
   把目标调高即可（这条警示要满速且持续高于目标 60 秒才出现，不会误报）。
 - **目标温度模式下温度稳定在比目标低 2–4°C 的位置**：这是死区的正常表现，不是偏差。
@@ -254,8 +310,32 @@ sudo ./Scripts/uninstall.sh
   socket 是 `root:admin 0660`，非管理员账号连不上。
 - **`swift build` 报缺少命令行工具**：先 `xcode-select --install`。
 
+### Intel Mac 相关
+
+- **Intel Mac 上完全无法控速**：先确认走的是哪条通道。守护进程上报的状态里有
+  `hasForceMask`（是否存在 `FS!` 键）和 `isAppleSilicon` 两个诊断字段，可以直接查：
+  ```bash
+  # 需要账号在 admin 组；这两个字段需要 1.2 及以上的守护进程
+  printf '{"command":"getStatus"}\n' | nc -U /var/run/com.leo.fancontrol.sock
+  ```
+  若 `hasForceMask` 为 `false` 且风扇也没有 `F{i}Md` 键，说明该机型两条通道都不存在，
+  当前实现覆盖不到，请反馈具体机型。
+- **Intel Mac 上自动模式风扇长期不动 / 一上来就狂转**：`intelPoints` 曲线未经实机校准，
+  温度量级可能对不上你的机型。先用"手动固定"确认风扇响应正常，再按实测调整
+  `FanModels.swift` 里的 `intelPoints` 控制点。
+- **DMG 拷给别人打不开、提示"已损坏"或"无法验证开发者"**：ad-hoc 签名 + 未公证的正常表现，
+  见上文 Gatekeeper 一节，执行 `xattr -dr com.apple.quarantine /Applications/LeoFanControl.app`。
+- **`install.sh` 报"二进制不支持本机架构"**：拿到的是只含单架构的包。
+  用 `./Scripts/make-dmg.sh` 或 `./Scripts/build-app.sh --universal` 重新构建。
+
+### 脚本相关
+
+- **改脚本时注意**：macOS 自带的是 bash 3.2，它会把紧跟在变量后面的**多字节字符**（例如中文全角括号 `（`）
+  的字节算进变量名里，配合 `set -u` 会直接报 `unbound variable` 并退出。
+  所以脚本里凡是变量后面紧跟中文，都必须写成 `${VAR}` 而不是 `$VAR`。
+
 ---
 
 ## 10. 技术致谢
 
-SMC 协议常量、`Ftst` 解锁机制、各代芯片差异等原理，参考了公开的逆向研究与文档（Asahi Linux SMC 文档、社区 SMC 键表、相关开源项目的研究记录）。本工程的全部代码为自行实现，未直接使用第三方二进制或库。
+SMC 协议常量、`Ftst` 解锁机制、`FS!` 强制模式位掩码、各代芯片差异等原理，参考了公开的逆向研究与文档（Asahi Linux SMC 文档、社区 SMC 键表、smcFanControl 等开源项目的研究记录）。本工程的全部代码为自行实现，未直接使用第三方二进制或库。

@@ -26,5 +26,5 @@ rm -rf "$INSTALL_DIR"
 # 守护进程被 SIGKILL 时来不及自己清理，这里兜底删掉残留的 socket
 rm -f "$SOCKET"
 
-echo "==> 日志保留在 $LOG_DIR（如需可手动删除）"
+echo "==> 日志保留在 ${LOG_DIR}（如需可手动删除）"
 echo "✅ 已卸载。风扇已交还 macOS 自动控制。"

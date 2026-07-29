@@ -1,4 +1,7 @@
 .build/
+.build-x86/
+dist/
+*.dmg
 *.app
 *.app/
 .DS_Store
