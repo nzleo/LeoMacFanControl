@@ -54,6 +54,10 @@ AppleSMC 内核驱动 → SMC 固件 → 风扇
 - `Sources/LeoFanControl/`：菜单栏 GUI。
 - `Sources/fanhelperd/`：root 守护进程。
 - `Scripts/`：构建与安装脚本。
+- `Scripts/make-icon.swift`：App 图标生成器。图标是**纯代码矢量绘制**（AppKit / CoreGraphics），
+  打包时由 `build-app.sh` 现场生成 `AppIcon.icns`，仓库里不存任何二进制图片素材，
+  和"全部可逐行审计"的原则一致。小尺寸（≤32 像素）走简化几何（4 叶、去投影），
+  否则叶片会细到糊成一团。
 
 ---
 

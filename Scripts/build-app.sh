@@ -32,6 +32,29 @@ mkdir -p "$APP/Contents/MacOS"
 mkdir -p "$APP/Contents/Resources"
 cp "$EXE" "$APP/Contents/MacOS/$APP_NAME"
 
+# 图标由 make-icon.swift 现场矢量绘制，仓库里不存二进制素材。
+# 生成失败不阻断打包——没图标只影响 Finder / 登录项列表的观感，不影响功能。
+echo "==> 生成图标"
+ICON_TMP="$(mktemp -d)"
+trap 'rm -rf "$ICON_TMP"' EXIT
+ICON_OK=0
+if swift "$SCRIPT_DIR/make-icon.swift" "$ICON_TMP"; then
+    if [[ -f "$ICON_TMP/AppIcon.icns" ]]; then
+        cp "$ICON_TMP/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+        ICON_OK=1
+    fi
+fi
+ICON_KEYS=""
+if [[ "$ICON_OK" == "1" ]]; then
+    # 只有图标真的存在才写这两个键，否则 Finder 会去找不存在的资源
+    ICON_KEYS="    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>"
+else
+    echo "提示：图标生成失败，继续打包（App 将显示为空白图标）。"
+fi
+
 cat > "$APP/Contents/Info.plist" <<PLIST_EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -51,6 +74,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST_EOF
     <string>$APP_NAME</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+$ICON_KEYS
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
     <!-- 菜单栏程序：不在 Dock 显示 -->
