@@ -24,6 +24,8 @@ final class AppState: ObservableObject {
     @Published var daemonRunning = false
     @Published var controlActive = false
     @Published var safetyEngaged = false
+    /// 目标温度模式下：已满速仍压不到目标温度
+    @Published var targetUnreachable = false
     @Published var tempHistory: [Double] = []
     @Published var launchAtLogin = false
     @Published var lastError: String? = nil
@@ -101,6 +103,7 @@ final class AppState: ObservableObject {
                 self.daemonRunning = false
                 self.controlActive = false
                 self.safetyEngaged = false
+                self.targetUnreachable = false
                 self.controlFailureReason = nil
                 self.cpuTemp = stats.average
                 self.cpuTempMax = stats.max
@@ -116,6 +119,7 @@ final class AppState: ObservableObject {
             self.daemonRunning = true
             self.controlActive = status.controlActive
             self.safetyEngaged = status.safetyEngaged
+            self.targetUnreachable = status.targetUnreachable
             self.controlFailureReason = status.controlFailureReason
             self.cpuTemp = status.cpuTempC
             self.cpuTempMax = status.cpuTempMaxC
@@ -169,6 +173,12 @@ final class AppState: ObservableObject {
     func setSafetyTemp(_ celsius: Double) {
         let r = FanConfig.safetyTempRange
         config.safetyTempC = min(max(celsius, r.lowerBound), r.upperBound)
+        pushConfig()
+    }
+
+    func setTargetTemp(_ celsius: Double) {
+        let r = FanConfig.targetTempRange
+        config.targetTempC = min(max(celsius, r.lowerBound), r.upperBound)
         pushConfig()
     }
 

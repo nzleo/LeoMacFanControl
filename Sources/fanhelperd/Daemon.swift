@@ -138,7 +138,8 @@ final class Daemon {
                             safetyEngaged: engine.safetyEngaged,
                             version: appVersion,
                             config: config,
-                            controlFailureReason: controlActive ? controller.lastFailureReason : nil)
+                            controlFailureReason: controlActive ? controller.lastFailureReason : nil,
+                            targetUnreachable: engine.targetUnreachable)
     }
 
     // MARK: 配置校验与持久化
@@ -147,14 +148,27 @@ final class Daemon {
     /// 守护进程是 root，绝不能无条件相信外部输入。
     private static func sanitized(_ cfg: FanConfig) -> FanConfig {
         var c = cfg
-        c.manualPercent = min(max(c.manualPercent, 0), 100)
-        let range = FanConfig.safetyTempRange
-        if !c.safetyTempC.isFinite {
-            c.safetyTempC = FanConfig.default.safetyTempC
-        } else {
-            c.safetyTempC = min(max(c.safetyTempC, range.lowerBound), range.upperBound)
-        }
+        c.manualPercent = c.manualPercent.isFinite ? min(max(c.manualPercent, 0), 100)
+                                                   : FanConfig.default.manualPercent
+        c.safetyTempC = Self.clamp(c.safetyTempC,
+                                   to: FanConfig.safetyTempRange,
+                                   fallback: FanConfig.default.safetyTempC)
+        c.targetTempC = Self.clamp(c.targetTempC,
+                                   to: FanConfig.targetTempRange,
+                                   fallback: FanConfig.default.targetTempC)
+        c.targetDeadbandC = Self.clamp(c.targetDeadbandC,
+                                       to: FanConfig.targetDeadbandRange,
+                                       fallback: FanConfig.default.targetDeadbandC)
         return c
+    }
+
+    /// NaN / 无穷退回默认值，其余夹进合法区间。
+    /// 守护进程跑在 root 下，任何来自 socket 或磁盘的数值都必须先过这一关。
+    private static func clamp(_ value: Double,
+                              to range: ClosedRange<Double>,
+                              fallback: Double) -> Double {
+        guard value.isFinite else { return fallback }
+        return min(max(value, range.lowerBound), range.upperBound)
     }
 
     private func loadConfig() {

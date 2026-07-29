@@ -12,6 +12,11 @@ struct ContentView: View {
     @EnvironmentObject var state: AppState
     @State private var manualPercent: Double = 50
     @State private var safetyTemp: Double = FanConfig.default.safetyTempC
+    @State private var targetTemp: Double = FanConfig.default.targetTempC
+
+    /// 面板宽度。360 而不是 340：控制模式那一排从 3 个选项变成了 4 个，
+    /// 每个都是 4 个汉字，宽度必须留够，否则 NSSegmentedControl 会把标签截成"系统…"。
+    private static let panelWidth: CGFloat = 360
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -22,21 +27,24 @@ struct ContentView: View {
             Divider()
             modeSection
             if state.config.mode == .auto { curveSection }
+            if state.config.mode == .target { targetSection }
             if state.config.mode == .manual { manualSection }
             safetySection
             Divider()
             footer
         }
         .padding(16)
-        .frame(width: 340)
+        .frame(width: Self.panelWidth)
         .onAppear {
             manualPercent = state.config.manualPercent
             safetyTemp = state.config.safetyTempC
+            targetTemp = state.config.targetTempC
         }
         // 首次连上守护进程时会以它的配置为准，滑块要跟着更新
         .onReceive(state.$config) { newValue in
             manualPercent = newValue.manualPercent
             safetyTemp = newValue.safetyTempC
+            targetTemp = newValue.targetTempC
         }
     }
 
@@ -154,6 +162,9 @@ struct ContentView: View {
                 }
             }
             .pickerStyle(.segmented)
+            // 4 段 × 4 个汉字：用 small 控件尺寸（11pt 字号）把每段的需求宽度压到 ~56pt，
+            // 面板内容区有 328pt、每段可用 82pt，留足余量，任何语言下都不会截断。
+            .controlSize(.small)
             .labelsHidden()
         }
     }
@@ -170,9 +181,38 @@ struct ContentView: View {
                 }
             }
             .pickerStyle(.segmented)
+            .controlSize(.small)        // 与上面的模式选择器保持同一种字号
             .labelsHidden()
             Text("温度越高，风扇自动越快；档位越强，提速越早。")
                 .font(.caption2).foregroundColor(.secondary)
+        }
+    }
+
+    // MARK: 目标温度（PI 闭环）
+
+    private var targetSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("目标温度").font(.caption).foregroundColor(.secondary)
+                Spacer()
+                Text("\(Int(targetTemp))°C").font(.caption.monospacedDigit())
+            }
+            Slider(value: $targetTemp,
+                   in: FanConfig.targetTempRange,
+                   step: 1) { editing in
+                if !editing { state.setTargetTemp(targetTemp) }
+            }
+            Text("风扇会自动调节转速，把 CPU 核心平均温度稳定在这个值附近；低于目标 \(Int(state.config.targetDeadbandC))°C 才会降速。")
+                .font(.caption2).foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("本机实测：空闲约 52°C，满载全速最低约 65°C")
+                .font(.caption2).foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            if state.targetUnreachable {
+                Text("已满速仍高于目标温度，该目标对本机不可达，请调高目标值")
+                    .font(.caption2).foregroundColor(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
