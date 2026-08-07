@@ -13,7 +13,9 @@
 [![最新版本](https://img.shields.io/github/v/release/nzleo/LeoMacFanControl?label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC&color=2ea44f)](https://github.com/nzleo/LeoMacFanControl/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-**[⬇️ 下载最新版本](https://github.com/nzleo/LeoMacFanControl/releases/latest)**
+**[🌐 项目主页](https://nzleo.github.io/LeoMacFanControl/)** · **[⬇️ 下载最新版本](https://github.com/nzleo/LeoMacFanControl/releases/latest)**
+
+同一作者的其他开源：[TourBox × ChatGPT / Codex 预设分享](https://nzleo.github.io/LeoTourBoxShare/)
 
 </div>
 
