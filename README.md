@@ -23,6 +23,16 @@
 
 ---
 
+## Leo 开源系列
+
+| 项目 | 说明 |
+| --- | --- |
+| [Leo 风扇控制](https://nzleo.github.io/LeoMacFanControl/) | macOS 菜单栏温控（本仓库） |
+| [LeoMDReader](https://nzleo.github.io/LeoMDReader/) | 轻量 Markdown 阅读 / 编辑 |
+| [TourBox × ChatGPT / Codex](https://nzleo.github.io/LeoTourBoxShare/) | TourBox 键位预设分享 |
+
+---
+
 ## 它解决什么问题
 
 macOS 的默认风扇策略偏保守。在 Mac mini 这类机型上，CPU 满载时系统常常**把风扇死守在最低转速**，任由温度一路爬升到芯片自己降频。

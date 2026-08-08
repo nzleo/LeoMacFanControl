@@ -11,8 +11,8 @@
   <link rel="icon" href="images/app-icon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260808-i18n" />
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -25,12 +25,17 @@
       </a>
       <div class="nav-right">
         <nav class="nav-links">
-          <a href="#why">为什么</a>
-          <a href="#modes">模式</a>
-          <a href="#install">安装</a>
-          <a href="#series">其他作品</a>
-          <a class="nav-cta" href="#download">下载</a>
+          <a href="#why" data-i18n="nav.why">为什么</a>
+          <a href="#modes" data-i18n="nav.modes">模式</a>
+          <a href="#install" data-i18n="nav.install">安装</a>
+          <a href="#series" data-i18n="nav.series">其他作品</a>
+          <a class="nav-cta" href="#download" data-i18n="nav.download">下载</a>
         </nav>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-lang="zh" aria-pressed="true">中</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+          <button type="button" data-lang="ja" aria-pressed="false">日</button>
+        </div>
       </div>
     </div>
   </header>
@@ -38,117 +43,117 @@
   <main id="top">
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">开源 · macOS 13+ · Apple Silicon &amp; Intel</p>
+        <p class="eyebrow" data-i18n="hero.eyebrow">开源 · macOS 13+ · Apple Silicon &amp; Intel</p>
         <h1 class="brand-title">
-          Leo 风扇控制
-          <span class="sub">让高负载时风扇真的转起来</span>
+          <span data-i18n="hero.title">Leo 风扇控制</span>
+          <span class="sub" data-i18n="hero.sub">让高负载时风扇真的转起来</span>
         </h1>
-        <p class="lede">菜单栏小工具：看温度、控转速。按曲线自动调速，或把核心平均温度闭环稳定在你指定的目标值。零网络、可审计、MIT。</p>
+        <p class="lede" data-i18n="hero.lede">菜单栏小工具：看温度、控转速。按曲线自动调速，或把核心平均温度闭环稳定在你指定的目标值。零网络、可审计、MIT。</p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="https://github.com/nzleo/LeoMacFanControl/releases/latest">下载最新版 DMG</a>
-          <a class="btn btn-ghost" href="https://github.com/nzleo/LeoMacFanControl" target="_blank" rel="noopener">查看源码</a>
+          <a class="btn btn-primary" href="https://github.com/nzleo/LeoMacFanControl/releases/latest" data-i18n="hero.ctaDownload">下载最新版 DMG</a>
+          <a class="btn btn-ghost" href="https://github.com/nzleo/LeoMacFanControl" target="_blank" rel="noopener" data-i18n="hero.ctaRepo">查看源码</a>
         </div>
-        <p class="meta">约 1.7 MB · 通用二进制 · 最新 v1.3</p>
+        <p class="meta" data-i18n="hero.meta">约 1.7 MB · 通用二进制 · 最新 v1.3</p>
       </div>
       <div class="hero-visual">
         <figure class="panel-frame">
-          <img src="images/panel-hero.png" width="364" height="573" alt="Leo 风扇控制面板：目标温度 70°C，守护进程运行中" />
+          <img src="images/panel-hero.png" width="364" height="573" data-i18n-alt="hero.imgAlt" alt="Leo 风扇控制面板：目标温度 70°C，守护进程运行中" />
         </figure>
       </div>
     </section>
 
     <section class="section" id="why">
       <div class="section-head">
-        <h2>它解决什么问题</h2>
-        <p>macOS 默认风扇策略偏保守。满载时风扇常死守最低转速，温度一路爬升到芯片降频。这个工具把控速能力交还给你。</p>
+        <h2 data-i18n="why.title">它解决什么问题</h2>
+        <p data-i18n="why.desc">macOS 默认风扇策略偏保守。满载时风扇常死守最低转速，温度一路爬升到芯片降频。这个工具把控速能力交还给你。</p>
       </div>
       <div class="compare-grid">
         <article class="compare-card bad">
-          <p class="label">macOS 默认 · 1000 RPM</p>
-          <p class="temp">&gt; 87°C</p>
-          <p>核心平均持续上升，单核峰值可超 103°C。90 秒仍未收敛。</p>
+          <p class="label" data-i18n="why.badLabel">macOS 默认 · 1000 RPM</p>
+          <p class="temp" data-i18n="why.badTemp">&gt; 87°C</p>
+          <p data-i18n="why.badDesc">核心平均持续上升，单核峰值可超 103°C。90 秒仍未收敛。</p>
         </article>
         <article class="compare-card good">
-          <p class="label">强制满速 · 4900 RPM</p>
-          <p class="temp">≈ 65°C</p>
-          <p>约 30 秒收敛稳定。同机同负载，温差约 22°C。</p>
+          <p class="label" data-i18n="why.goodLabel">强制满速 · 4900 RPM</p>
+          <p class="temp" data-i18n="why.goodTemp">≈ 65°C</p>
+          <p data-i18n="why.goodDesc">约 30 秒收敛稳定。同机同负载，温差约 22°C。</p>
         </article>
       </div>
-      <p class="compare-note">数据来自 M4 Mac mini（Mac16,10）10 线程满载实测。空闲约 52°C，曲线起点在此之上，闲时不会无谓提速。</p>
+      <p class="compare-note" data-i18n="why.note">数据来自 M4 Mac mini（Mac16,10）10 线程满载实测。空闲约 52°C，曲线起点在此之上，闲时不会无谓提速。</p>
     </section>
 
     <section class="section" id="modes">
       <div class="section-head">
-        <h2>四种控制模式</h2>
-        <p>从菜单栏点开面板即可切换。另有高温保护：单核峰值超阈值就强制满速。</p>
+        <h2 data-i18n="modes.title">四种控制模式</h2>
+        <p data-i18n="modes.desc">从菜单栏点开面板即可切换。另有高温保护：单核峰值超阈值就强制满速。</p>
       </div>
       <div class="modes">
         <article class="mode-card">
-          <h3>系统自动</h3>
-          <p>交还给 macOS。默认最安全，只监控不控速。</p>
+          <h3 data-i18n="modes.aTitle">系统自动</h3>
+          <p data-i18n="modes.aDesc">交还给 macOS。默认最安全，只监控不控速。</p>
         </article>
         <article class="mode-card">
-          <h3>自动温控</h3>
-          <p>按温度曲线升降速，可选静音 / 均衡 / 强力降温。</p>
+          <h3 data-i18n="modes.bTitle">自动温控</h3>
+          <p data-i18n="modes.bDesc">按温度曲线升降速，可选静音 / 均衡 / 强力降温。</p>
         </article>
         <article class="mode-card featured">
-          <span class="mode-tag">推荐</span>
-          <h3>目标温度</h3>
-          <p>设一个目标（如 70°C），风扇自动找到刚好压住它的转速。低于目标 4°C 才降速，避免抽速。</p>
+          <span class="mode-tag" data-i18n="modes.tag">推荐</span>
+          <h3 data-i18n="modes.cTitle">目标温度</h3>
+          <p data-i18n="modes.cDesc">设一个目标（如 70°C），风扇自动找到刚好压住它的转速。低于目标 4°C 才降速，避免抽速。</p>
         </article>
         <article class="mode-card">
-          <h3>手动固定</h3>
-          <p>用滑块锁一个固定转速百分比，适合先确认风扇是否响应。</p>
+          <h3 data-i18n="modes.dTitle">手动固定</h3>
+          <p data-i18n="modes.dDesc">用滑块锁一个固定转速百分比，适合先确认风扇是否响应。</p>
         </article>
       </div>
     </section>
 
     <section class="section" id="features">
       <div class="section-head">
-        <h2>设计取舍</h2>
-        <p>控速必须有 root。市面上同类软件你很难逐行确认它还做了什么——这里全部可审计。</p>
+        <h2 data-i18n="features.title">设计取舍</h2>
+        <p data-i18n="features.desc">控速必须有 root。市面上同类软件你很难逐行确认它还做了什么——这里全部可审计。</p>
       </div>
       <div class="pillars">
         <article>
-          <h3>零网络</h3>
-          <p>不发任何请求。全工程只有本机 Unix socket，用于 GUI 与守护进程通信。</p>
+          <h3 data-i18n="features.aTitle">零网络</h3>
+          <p data-i18n="features.aDesc">不发任何请求。全工程只有本机 Unix socket，用于 GUI 与守护进程通信。</p>
         </article>
         <article>
-          <h3>源码可审</h3>
-          <p>只用 Apple 自带框架，无第三方依赖。MIT 开源。</p>
+          <h3 data-i18n="features.bTitle">源码可审</h3>
+          <p data-i18n="features.bDesc">只用 Apple 自带框架，无第三方依赖。MIT 开源。</p>
         </article>
         <article>
-          <h3>守护进程收敛</h3>
-          <p>root 进程只读写 SMC 风扇键，不监听网络端口。</p>
+          <h3 data-i18n="features.cTitle">守护进程收敛</h3>
+          <p data-i18n="features.cDesc">root 进程只读写 SMC 风扇键，不监听网络端口。</p>
         </article>
         <article>
-          <h3>通用二进制</h3>
-          <p>Apple 芯片与 Intel 都能装。需要 macOS 13 或更高。</p>
+          <h3 data-i18n="features.dTitle">通用二进制</h3>
+          <p data-i18n="features.dDesc">Apple 芯片与 Intel 都能装。需要 macOS 13 或更高。</p>
         </article>
       </div>
     </section>
 
     <section class="section" id="install">
       <div class="section-head">
-        <h2>下载与安装</h2>
-        <p>先装 App 就能监控；要控速再装守护进程（需要一次管理员密码）。</p>
+        <h2 data-i18n="install.title">下载与安装</h2>
+        <p data-i18n="install.desc">先装 App 就能监控；要控速再装守护进程（需要一次管理员密码）。</p>
       </div>
       <ol class="howto">
         <li>
-          <strong>下载 DMG 并拖进「应用程序」</strong>
-          <p>从 <a href="https://github.com/nzleo/LeoMacFanControl/releases/latest">Releases</a> 下载 <code>LeoFanControl-*.dmg</code>，把 App 拖到应用程序文件夹。</p>
+          <strong data-i18n="install.1t">下载 DMG 并拖进「应用程序」</strong>
+          <p data-i18n-html="install.1dHtml">从 <a href="https://github.com/nzleo/LeoMacFanControl/releases/latest">Releases</a> 下载 <code>LeoFanControl-*.dmg</code>，把 App 拖到应用程序文件夹。</p>
         </li>
         <li>
-          <strong>首次打开手动放行</strong>
-          <p>未做 Apple 公证，会被 Gatekeeper 拦。按住 Control 点击 App → 打开 → 再点打开。或：<code>xattr -dr com.apple.quarantine /Applications/LeoFanControl.app</code></p>
+          <strong data-i18n="install.2t">首次打开手动放行</strong>
+          <p data-i18n-html="install.2dHtml">未做 Apple 公证，会被 Gatekeeper 拦。按住 Control 点击 App → 打开 → 再点打开。或：<code>xattr -dr com.apple.quarantine /Applications/LeoFanControl.app</code></p>
         </li>
         <li>
-          <strong>在菜单栏找到风扇图标</strong>
-          <p>没有窗口、不进程序坞。顶部菜单栏会出现风扇图标和当前温度。</p>
+          <strong data-i18n="install.3t">在菜单栏找到风扇图标</strong>
+          <p data-i18n="install.3d">没有窗口、不进程序坞。顶部菜单栏会出现风扇图标和当前温度。</p>
         </li>
         <li>
-          <strong>（可选）安装守护进程以控速</strong>
-          <p>打开终端，进入 DMG 里的「守护进程（控速必需）」文件夹，执行 <code>sudo ./install.sh</code>。面板右上角会显示「守护进程运行中」。</p>
+          <strong data-i18n="install.4t">（可选）安装守护进程以控速</strong>
+          <p data-i18n-html="install.4dHtml">打开终端，进入 DMG 里的「守护进程（控速必需）」文件夹，执行 <code>sudo ./install.sh</code>。面板右上角会显示「守护进程运行中」。</p>
         </li>
       </ol>
     </section>
@@ -156,17 +161,17 @@
     <section class="section">
       <div class="gate-panel" id="gate">
         <div class="gate-copy">
-          <p class="eyebrow">首次打开必看</p>
-          <h2>「无法验证开发者」是正常的</h2>
-          <p>这个 App 没有购买每年 99 美元的开发者证书，也未做公证。系统拦一下不代表文件损坏。</p>
+          <p class="eyebrow" data-i18n="gate.eyebrow">首次打开必看</p>
+          <h2 data-i18n="gate.title">「无法验证开发者」是正常的</h2>
+          <p data-i18n="gate.p">这个 App 没有购买每年 99 美元的开发者证书，也未做公证。系统拦一下不代表文件损坏。</p>
           <ol class="steps">
-            <li>在「应用程序」里找到 LeoFanControl</li>
-            <li><strong>按住 Control 键点击</strong> → 选择「打开」</li>
-            <li>弹窗里再点一次「打开」</li>
+            <li data-i18n="gate.s1">在「应用程序」里找到 LeoFanControl</li>
+            <li data-i18n-html="gate.s2Html"><strong>按住 Control 键点击</strong> → 选择「打开」</li>
+            <li data-i18n="gate.s3">弹窗里再点一次「打开」</li>
           </ol>
         </div>
         <aside class="gate-aside">
-          <h3>命令行最快</h3>
+          <h3 data-i18n="gate.asideTitle">命令行最快</h3>
           <p><code>xattr -dr com.apple.quarantine /Applications/LeoFanControl.app</code></p>
         </aside>
       </div>
@@ -174,73 +179,68 @@
 
     <section class="section">
       <div class="section-head">
-        <h2>长什么样</h2>
-        <p>菜单栏常驻温度；点开就是完整控制面板。</p>
+        <h2 data-i18n="shots.title">长什么样</h2>
+        <p data-i18n="shots.desc">菜单栏常驻温度；点开就是完整控制面板。</p>
       </div>
       <div class="shot-row">
         <figure class="shot-card">
-          <img src="images/panel.png" width="402" height="auto" alt="控制面板特写：目标温度模式" />
-          <figcaption>目标温度模式实拍。右上角绿色「守护进程运行中」+ 蓝色「正在控速」表示控速已生效。</figcaption>
+          <img src="images/panel.png" width="402" height="auto" data-i18n-alt="shots.panelAlt" alt="控制面板特写：目标温度模式" />
+          <figcaption data-i18n="shots.panelCap">目标温度模式实拍。右上角绿色「守护进程运行中」+ 蓝色「正在控速」表示控速已生效。</figcaption>
         </figure>
         <figure class="shot-card">
-          <img src="images/menubar.png" width="460" height="auto" alt="菜单栏上的风扇图标与温度" />
-          <figcaption>菜单栏：风扇图标 + 当前核心平均温度。按住 Command 可拖动位置。</figcaption>
+          <img src="images/menubar.png" width="460" height="auto" data-i18n-alt="shots.menuAlt" alt="菜单栏上的风扇图标与温度" />
+          <figcaption data-i18n="shots.menuCap">菜单栏：风扇图标 + 当前核心平均温度。按住 Command 可拖动位置。</figcaption>
         </figure>
       </div>
     </section>
 
     <section class="section" id="download">
       <div class="download-panel">
-        <h2>下载并开始用</h2>
-        <p>免费开源。装完先监控，需要时再装守护进程接管风扇。</p>
+        <h2 data-i18n="download.title">下载并开始用</h2>
+        <p data-i18n="download.desc">免费开源。装完先监控，需要时再装守护进程接管风扇。</p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="https://github.com/nzleo/LeoMacFanControl/releases/latest">下载 LeoFanControl DMG</a>
-          <a class="btn btn-ghost" href="https://github.com/nzleo/LeoMacFanControl" target="_blank" rel="noopener">GitHub 仓库</a>
+          <a class="btn btn-primary" href="https://github.com/nzleo/LeoMacFanControl/releases/latest" data-i18n="download.cta">下载 LeoFanControl DMG</a>
+          <a class="btn btn-ghost" href="https://github.com/nzleo/LeoMacFanControl" target="_blank" rel="noopener" data-i18n="download.repo">GitHub 仓库</a>
         </div>
-        <p class="meta">v1.3 · MIT License · 使用风扇控制请自担风险</p>
+        <p class="meta" data-i18n="download.meta">v1.3 · MIT License · 使用风扇控制请自担风险</p>
       </div>
     </section>
 
     <section class="series" id="series">
       <div class="series-head">
-        <h2>Leo 开源系列</h2>
-        <p>看看我的其他作品。</p>
+        <h2 data-i18n="series.title">Leo 开源系列</h2>
+        <p data-i18n="series.desc">同一作者维护的开源小工具与工作流分享。页面风格统一，方便互相找到。</p>
       </div>
       <div class="series-grid">
         <div class="series-card current">
-          <p class="series-kicker">当前页面</p>
-          <h3>Leo 风扇控制</h3>
-          <p>macOS 菜单栏温控：按 CPU 温度自动调速或闭环稳温。</p>
+          <p class="series-kicker" data-i18n="series.current">当前页面</p>
+          <h3 data-i18n="series.fanTitle">Leo 风扇控制</h3>
+          <p data-i18n="series.fanDesc">macOS 菜单栏温控：按 CPU 温度自动调速或闭环稳温。</p>
         </div>
         <a class="series-card" href="https://nzleo.github.io/LeoMDReader/" target="_blank" rel="noopener">
-          <p class="series-kicker">其他作品</p>
+          <p class="series-kicker" data-i18n="series.other">其他作品</p>
           <h3>LeoMDReader</h3>
-          <p>轻量 macOS Markdown 阅读 / 编辑：双击打开，左侧目录，右侧正文。</p>
+          <p data-i18n="series.mdDesc">轻量 macOS Markdown 阅读 / 编辑：双击打开，左侧目录，右侧正文。</p>
         </a>
         <a class="series-card" href="https://nzleo.github.io/LeoTourBoxShare/" target="_blank" rel="noopener">
-          <p class="series-kicker">其他作品</p>
+          <p class="series-kicker" data-i18n="series.other">其他作品</p>
           <h3>TourBox × ChatGPT / Codex</h3>
-          <p>TourBox 键位预设分享：模型、推理强度、活跃任务、审批与全局语音一手搞定。</p>
+          <p data-i18n="series.tourboxDesc">TourBox 键位预设分享：模型、推理强度、活跃任务、审批与全局语音一手搞定。</p>
         </a>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <p>Leo 风扇控制 · MIT · 由 <a href="https://github.com/nzleo">nzleo</a> 维护</p>
+    <p data-i18n="footer.copy">Leo 风扇控制 · MIT · 由 nzleo 维护</p>
     <div class="footer-links">
-      <a href="https://github.com/nzleo/LeoMacFanControl">源码</a>
-      <a href="https://nzleo.github.io/LeoMDReader/">LeoMDReader</a>
-      <a href="https://nzleo.github.io/LeoTourBoxShare/">TourBox 预设</a>
-      <a href="https://github.com/nzleo/LeoMacFanControl/blob/main/docs/troubleshooting.md">故障排查</a>
+      <a href="https://github.com/nzleo/LeoMacFanControl" data-i18n="footer.repo">源码</a>
+      <a href="https://nzleo.github.io/LeoMDReader/" data-i18n="footer.md">LeoMDReader</a>
+      <a href="https://nzleo.github.io/LeoTourBoxShare/" data-i18n="footer.tourbox">TourBox 预设</a>
+      <a href="https://github.com/nzleo/LeoMacFanControl/blob/main/docs/troubleshooting.md" data-i18n="footer.trouble">故障排查</a>
     </div>
   </footer>
 
-  <script>
-    const nav = document.querySelector(".nav-shell");
-    const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-  </script>
+  <script src="i18n.js?v=20260808-i18n"></script>
 </body>
 </html>

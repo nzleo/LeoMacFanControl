@@ -15,8 +15,8 @@
   --shadow: 0 24px 60px rgba(20, 32, 28, 0.1);
   --radius: 18px;
   --font-display: "Outfit", "Noto Sans SC", sans-serif;
-  --font-cjk: "Noto Sans SC", "PingFang SC", "Hiragino Sans", sans-serif;
-  --font-body: "Sora", "Noto Sans SC", sans-serif;
+  --font-cjk: "Noto Sans SC", "Noto Sans JP", "PingFang SC", "Hiragino Sans", sans-serif;
+  --font-body: "Sora", "Noto Sans SC", "Noto Sans JP", sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -38,6 +38,9 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 }
+
+html[lang="ja"] body { font-family: "Sora", "Noto Sans JP", "Hiragino Sans", sans-serif; }
+html[lang="en"] body { letter-spacing: 0; line-height: 1.65; }
 
 .noise {
   pointer-events: none;
@@ -120,6 +123,31 @@ main, .footer { position: relative; z-index: 1; }
   color: #fff8f0 !important;
 }
 .nav-cta:hover { background: var(--accent) !important; color: #fff !important; }
+
+.lang-switch {
+  display: inline-flex;
+  padding: 0.22rem;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.75);
+  border: 1px solid var(--line);
+  gap: 0.15rem;
+}
+.lang-switch button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.4rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lang-switch button[aria-pressed="true"] {
+  background: var(--ink);
+  color: #fff8f0;
+}
 
 .hero {
   max-width: 1120px;
