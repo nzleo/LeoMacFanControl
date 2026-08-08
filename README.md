@@ -15,7 +15,9 @@
 
 **[🌐 项目主页](https://nzleo.github.io/LeoMacFanControl/)** · **[⬇️ 下载最新版本](https://github.com/nzleo/LeoMacFanControl/releases/latest)**
 
-同一作者的其他开源：[TourBox × ChatGPT / Codex 预设分享](https://nzleo.github.io/LeoTourBoxShare/)
+同一作者的其他开源：
+[LeoMDReader](https://nzleo.github.io/LeoMDReader/) ·
+[TourBox × ChatGPT / Codex 预设分享](https://nzleo.github.io/LeoTourBoxShare/)
 
 </div>
 
