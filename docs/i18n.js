@@ -78,7 +78,7 @@ const I18N = {
     "download.repo": "GitHub 仓库",
     "download.meta": "v1.3 · MIT License · 使用风扇控制请自担风险",
     "series.title": "Leo 开源系列",
-    "series.desc": "看看我的其他作品。",
+    "series.desc": "看看我的其他开源项目。",
     "series.current": "当前页面",
     "series.other": "其他作品",
     "series.fanTitle": "Leo 风扇控制",
