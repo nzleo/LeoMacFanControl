@@ -85,10 +85,12 @@ const I18N = {
     "series.fanDesc": "菜单栏温控：真实让风扇转起来；零网络、可审计、开源免费。",
     "series.mdDesc": "轻量 Markdown：双击打开就能看；左目录右正文，可编辑；不臃肿、不收费墙。",
     "series.tourboxDesc": "左手工作流预设：模型、推理、任务、审批与全局语音；已通过 TourBox 官方审核。",
+    "series.launcherDesc": "空间分区启动器：⌥ Space 呼出；系统 Launchpad 不好用才做的。一个应用一个分类，布局随 iCloud。开源，可下 DMG。",
     "footer.copy": "Leo 风扇控制 · MIT · 由 nzleo 维护",
     "footer.repo": "源码",
     "footer.md": "LeoMDReader",
     "footer.tourbox": "TourBox 预设",
+    "footer.launcher": "LeoLauncher",
     "footer.trouble": "故障排查"
   },
   en: {
@@ -173,10 +175,12 @@ const I18N = {
     "series.fanDesc": "Menu-bar thermal control that actually spins the fans — zero network, auditable, free.",
     "series.mdDesc": "Lightweight Markdown: double-click to read; outline left, content right; editable; no bloat, no paywall.",
     "series.tourboxDesc": "Left-hand workflow preset: models, reasoning, tasks, approvals, global voice — TourBox-approved.",
+    "series.launcherDesc": "Spatial launcher: ⌥ Space to open. Built because system Launchpad got hard to use. One app per category, layout follows iCloud. Open source, DMG available.",
     "footer.copy": "Leo Fan Control · MIT · by nzleo",
     "footer.repo": "Source",
     "footer.md": "LeoMDReader",
     "footer.tourbox": "TourBox preset",
+    "footer.launcher": "LeoLauncher",
     "footer.trouble": "Troubleshooting"
   },
   ja: {
@@ -261,10 +265,12 @@ const I18N = {
     "series.fanDesc": "メニューバー温控。本当にファンを回す。ゼロネットワーク・監査可能・無料。",
     "series.mdDesc": "軽量 Markdown。ダブルクリックで開く。左目次・右本文、編集可。肥大化も課金壁もなし。",
     "series.tourboxDesc": "左手ワークフロープリセット。モデル・推論・タスク・承認・音声。TourBox 公式審査通過。",
+    "series.launcherDesc": "空間ランチャー。⌥ Space で呼び出し。システムの Launchpad が使いにくくなったから作った。1アプリ1分類、レイアウトは iCloud。オープンソース、DMG あり。",
     "footer.copy": "Leo ファン制御 · MIT · nzleo が維持",
     "footer.repo": "ソース",
     "footer.md": "LeoMDReader",
     "footer.tourbox": "TourBox プリセット",
+    "footer.launcher": "LeoLauncher",
     "footer.trouble": "トラブルシュート"
   }
 };
